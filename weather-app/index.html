@@ -24,7 +24,7 @@
             card.innerHTML = '<div class="loading">Loading ' + city + '...</div>';
             container.appendChild(card);
 
-            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.weather && data.weather.length > 0) {
