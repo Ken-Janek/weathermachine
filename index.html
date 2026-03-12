@@ -157,8 +157,8 @@
 <body>
     <main class="app">
         <section class="hero">
-            <h1>Weather App</h1>
-            <p>Current weather overview</p>
+            <h1>Ilmarakendus</h1>
+            <p>Praeguse ilma ülevaade</p>
         </section>
         <section class="map-wrap">
             <div id="location-map"></div>
@@ -170,7 +170,7 @@
         const cities = ['Tallinn', 'Tartu', 'Pärnu', 'Narva', 'Viljandi'];
         const container = document.getElementById('weather-container');
         const map = L.map('location-map', { zoomControl: true }).setView([58.7, 25.4], 7);
-        const locationMapMarker = L.marker([58.7, 25.4]).addTo(map).bindPopup('Default map center: Estonia');
+        const locationMapMarker = L.marker([58.7, 25.4]).addTo(map).bindPopup('Kaardi vaikekeskpunkt: Eesti');
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
@@ -189,16 +189,16 @@
                 '<p class="temp">' + Math.round(data.main.temp) + '°C</p>' +
                 '<p class="condition">' + data.weather[0].description + '</p>' +
                 '<div class="meta">' +
-                '<span>Feels like ' + Math.round(data.main.feels_like) + '°C</span>' +
-                '<span>Humidity ' + data.main.humidity + '%</span>' +
-                '<span>Wind ' + data.wind.speed + ' m/s</span>' +
+                '<span>Tundub nagu ' + Math.round(data.main.feels_like) + '°C</span>' +
+                '<span>Niiskus ' + data.main.humidity + '%</span>' +
+                '<span>Tuul ' + data.wind.speed + ' m/s</span>' +
                 '</div>';
         }
 
         // Geolocation card at top
         const geoCard = document.createElement('div');
         geoCard.className = 'weather-card your-location';
-        geoCard.innerHTML = '<p class="loading">Detecting your location...</p>';
+        geoCard.innerHTML = '<p class="loading">Tuvastan sinu asukohta...</p>';
         container.appendChild(geoCard);
 
         if (navigator.geolocation) {
@@ -206,7 +206,7 @@
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
                 map.setView([lat, lon], 11);
-                locationMapMarker.setLatLng([lat, lon]).bindPopup('Your current location').openPopup();
+                locationMapMarker.setLatLng([lat, lon]).bindPopup('Sinu praegune asukoht').openPopup();
 
                 fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&appid=' + API_KEY + '&units=metric')
                     .then(r => r.json())
@@ -214,23 +214,23 @@
                         if (data.weather && data.weather.length > 0) {
                             renderWeatherCard(geoCard, data, '📍 ' + data.name);
                         } else {
-                            geoCard.innerHTML = '<p class="error">Weather data unavailable.</p>';
+                            geoCard.innerHTML = '<p class="error">Ilmaandmed pole saadaval.</p>';
                         }
                     })
-                    .catch(() => { geoCard.innerHTML = '<p class="error">Failed to load your location weather.</p>'; });
+                    .catch(() => { geoCard.innerHTML = '<p class="error">Sinu asukoha ilma laadimine ebaõnnestus.</p>'; });
             }, function() {
-                geoCard.innerHTML = '<p class="error">Location access denied.</p>';
-                locationMapMarker.bindPopup('Location access denied.').openPopup();
+                geoCard.innerHTML = '<p class="error">Asukohale ligipääs keelati.</p>';
+                locationMapMarker.bindPopup('Asukohale ligipääs keelati.').openPopup();
             });
         } else {
-            geoCard.innerHTML = '<p class="error">Geolocation not supported.</p>';
-            locationMapMarker.bindPopup('Geolocation not supported.').openPopup();
+            geoCard.innerHTML = '<p class="error">Geolokatsioon pole toetatud.</p>';
+            locationMapMarker.bindPopup('Geolokatsioon pole toetatud.').openPopup();
         }
 
         cities.forEach(city => {
             const card = document.createElement('div');
             card.className = 'weather-card';
-            card.innerHTML = '<p class="loading">Loading ' + city + '...</p>';
+            card.innerHTML = '<p class="loading">Laen: ' + city + '...</p>';
             container.appendChild(card);
 
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`)
@@ -239,11 +239,11 @@
                     if (data.weather && data.weather.length > 0) {
                         renderWeatherCard(card, data, city);
                     } else {
-                        card.innerHTML = '<p class="error">Weather data unavailable.</p>';
+                        card.innerHTML = '<p class="error">Ilmaandmed pole saadaval.</p>';
                     }
                 })
                 .catch(() => {
-                    card.innerHTML = '<p class="error">Failed to load ' + city + '.</p>';
+                    card.innerHTML = '<p class="error">Linna ' + city + ' andmete laadimine ebaõnnestus.</p>';
                 });
         });
     </script>
