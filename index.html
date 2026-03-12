@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; padding: 2rem; min-height: 100vh; box-sizing: border-box; }
+        .container { display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; max-width: 320px; }
+        .weather-card { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; width: 100%; box-sizing: border-box; }
+        .loading { color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container" id="weather-container"></div>
+    <script>
+        const API_KEY = '542fcb5a99721dd037420fd7893c8567';
+        const cities = ['Tallinn', 'Tartu', 'P├ñrnu', 'Narva', 'Viljandi'];
+        const container = document.getElementById('weather-container');
+
+        cities.forEach(city => {
+            const card = document.createElement('div');
+            card.className = 'weather-card';
+            card.innerHTML = '<div class="loading">Loading ' + city + '...</div>';
+            container.appendChild(card);
+
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.weather && data.weather.length > 0) {
+                        card.innerHTML = `
+                            <h2>${city}</h2>
+                            <div style="font-size:2rem;">${data.weather[0].main}</div>
+                            <div>${data.main.temp}┬░C</div>
+                        `;
+                    } else {
+                        card.innerHTML = '<div>Weather data unavailable.</div>';
+                    }
+                })
+                .catch(() => {
+                    card.innerHTML = `<div>Failed to load ${city}.</div>`;
+                });
+        });
+    </script>
+</body>
+</html>
