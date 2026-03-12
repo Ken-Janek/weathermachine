@@ -286,7 +286,7 @@
                     .then(r => r.json())
                     .then(data => {
                         if (data.weather && data.weather.length > 0) {
-                            renderWeatherCard(geoCard, data, '📍 ' + data.name);
+                            renderWeatherCard(geoCard, data, data.name);
                         } else {
                             geoCard.innerHTML = '<p class="error">Ilmaandmed pole saadaval.</p>';
                         }
