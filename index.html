@@ -4,169 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-top: #f3e7d2;
-            --bg-bottom: #e9ddcc;
-            --ink: #32261c;
-            --muted: #7a6656;
-            --card: rgba(255, 249, 241, 0.9);
-            --accent: #b4633a;
-            --accent-soft: #efd5c4;
-            --shadow: 0 14px 30px rgba(73, 52, 38, 0.15);
+            --sky-top: #0e4c92;
+            --sky-mid: #2f80c8;
+            --sky-bottom: #9fd3ff;
+            --panel: rgba(255, 255, 255, 0.84);
+            --panel-border: rgba(255, 255, 255, 0.55);
+            --text-main: #0f2438;
+            --text-sub: #35516d;
+            --accent: #0d6bcf;
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: 'Nunito', sans-serif;
-            color: var(--ink);
-            background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem 3rem;
             min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-main);
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 42%, var(--sky-bottom) 100%);
+            padding: 2rem 1rem 3rem;
         }
 
-        .app-shell {
+        .app {
             width: 100%;
-            max-width: 720px;
-            position: relative;
+            max-width: 860px;
+            margin: 0 auto;
         }
 
-        .app-shell::before,
-        .app-shell::after {
-            content: '';
-            position: absolute;
-            border-radius: 999px;
-            filter: blur(1px);
-            z-index: 0;
-            pointer-events: none;
+        .hero {
+            padding: 1.5rem;
+            border-radius: 20px;
+            background: linear-gradient(140deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            color: #f4f9ff;
+            box-shadow: 0 18px 40px rgba(8, 30, 65, 0.24);
+            margin-bottom: 1rem;
         }
 
-        .app-shell::before {
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(255, 208, 176, 0.45), transparent 70%);
-            top: -30px;
-            right: -10px;
+        .hero h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            letter-spacing: 0.02em;
         }
 
-        .app-shell::after {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(210, 173, 149, 0.25), transparent 70%);
-            bottom: 20px;
-            left: -20px;
-        }
-
-        .title {
-            position: relative;
-            z-index: 1;
-            font-family: 'Fraunces', serif;
-            font-size: clamp(1.9rem, 5vw, 2.6rem);
-            margin: 0 0 0.3rem;
-            text-align: center;
-        }
-
-        .subtitle {
-            position: relative;
-            z-index: 1;
-            margin: 0 0 1.4rem;
-            text-align: center;
-            color: var(--muted);
+        .hero p {
+            margin: 0.45rem 0 0;
+            opacity: 0.92;
         }
 
         .container {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 0.9rem;
-            width: 100%;
         }
 
         .weather-card {
-            width: 100%;
-            background: var(--card);
-            border: 1px solid rgba(139, 99, 73, 0.15);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            padding: 1.1rem 1.2rem;
-            backdrop-filter: blur(2px);
-            transform: translateY(10px);
-            opacity: 0;
-            animation: cardIn 0.55s ease forwards;
+            border-radius: 18px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 10px 26px rgba(17, 45, 77, 0.2);
+            padding: 1rem;
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .weather-card.your-location {
-            border: 2px solid var(--accent);
-            background: linear-gradient(160deg, rgba(255, 247, 238, 0.96), rgba(246, 228, 212, 0.8));
+            grid-column: 1 / -1;
+            background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(219, 239, 255, 0.9));
+            border: 1px solid rgba(13, 107, 207, 0.28);
         }
 
-        .weather-card h2 {
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .city {
             margin: 0;
-            font-family: 'Fraunces', serif;
-            font-size: 1.4rem;
-            line-height: 1.2;
-        }
-
-        .condition {
-            margin-top: 0.45rem;
-            font-size: 1.05rem;
-            color: var(--muted);
+            font-size: 1.2rem;
+            font-weight: 700;
         }
 
         .temp {
-            margin-top: 0.2rem;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--ink);
+            margin: 0.35rem 0 0;
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
         }
 
-        .loading {
-            color: var(--muted);
-            text-align: center;
-            font-weight: 700;
+        .condition {
+            margin: 0.2rem 0 0;
+            color: var(--text-sub);
+            font-weight: 600;
         }
 
-        @keyframes cardIn {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .meta {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.9rem;
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            flex-wrap: wrap;
         }
 
-        @media (max-width: 600px) {
-            body { padding: 1.4rem 0.8rem 2.4rem; }
-            .weather-card { border-radius: 14px; }
+        .meta span {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 0.32rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .loading,
+        .error {
+            color: var(--text-sub);
+            margin: 0;
+        }
+
+        .weather-icon {
+            width: 56px;
+            height: 56px;
+        }
+
+        @media (max-width: 560px) {
+            .hero h1 { font-size: 1.6rem; }
+            .temp { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
-    <main class="app-shell">
-        <h1 class="title">Cozy Weather</h1>
-        <p class="subtitle">Your location first, then Estonia city updates</p>
-        <div class="container" id="weather-container"></div>
+    <main class="app">
+        <section class="hero">
+            <h1>Sky Snapshot</h1>
+            <p>Current location + key Estonian cities</p>
+        </section>
+        <section class="container" id="weather-container"></section>
     </main>
     <script>
         const API_KEY = '542fcb5a99721dd037420fd7893c8567';
         const cities = ['Tallinn', 'Tartu', 'Pärnu', 'Narva', 'Viljandi'];
         const container = document.getElementById('weather-container');
 
-        function weatherMarkup(title, condition, temp, pin) {
-            const heading = pin ? '&#128205; ' + title : title;
-            return '<h2>' + heading + '</h2><div class="condition">' + condition + '</div><div class="temp">' + temp + '&deg;C</div>';
+        function renderWeatherCard(card, data, label) {
+            const iconCode = data.weather[0].icon;
+            const iconUrl = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
+            const cityName = label || data.name;
+
+            card.innerHTML =
+                '<div class="card-top">' +
+                '<h2 class="city">' + cityName + '</h2>' +
+                '<img class="weather-icon" src="' + iconUrl + '" alt="' + data.weather[0].description + '">' +
+                '</div>' +
+                '<p class="temp">' + Math.round(data.main.temp) + '°C</p>' +
+                '<p class="condition">' + data.weather[0].description + '</p>' +
+                '<div class="meta">' +
+                '<span>Feels like ' + Math.round(data.main.feels_like) + '°C</span>' +
+                '<span>Humidity ' + data.main.humidity + '%</span>' +
+                '<span>Wind ' + data.wind.speed + ' m/s</span>' +
+                '</div>';
         }
 
         // Geolocation card at top
         const geoCard = document.createElement('div');
         geoCard.className = 'weather-card your-location';
-        geoCard.innerHTML = '<div class="loading">Detecting your location...</div>';
+        geoCard.innerHTML = '<p class="loading">Detecting your location...</p>';
         container.appendChild(geoCard);
 
         if (navigator.geolocation) {
@@ -177,36 +184,36 @@
                     .then(r => r.json())
                     .then(data => {
                         if (data.weather && data.weather.length > 0) {
-                            geoCard.innerHTML = weatherMarkup(data.name, data.weather[0].main, data.main.temp, true);
+                            renderWeatherCard(geoCard, data, '📍 ' + data.name);
                         } else {
-                            geoCard.innerHTML = '<div>Weather data unavailable.</div>';
+                            geoCard.innerHTML = '<p class="error">Weather data unavailable.</p>';
                         }
                     })
-                    .catch(() => { geoCard.innerHTML = '<div>Failed to load your location weather.</div>'; });
+                    .catch(() => { geoCard.innerHTML = '<p class="error">Failed to load your location weather.</p>'; });
             }, function() {
-                geoCard.innerHTML = '<div>Location access denied.</div>';
+                geoCard.innerHTML = '<p class="error">Location access denied.</p>';
             });
         } else {
-            geoCard.innerHTML = '<div>Geolocation not supported.</div>';
+            geoCard.innerHTML = '<p class="error">Geolocation not supported.</p>';
         }
 
         cities.forEach(city => {
             const card = document.createElement('div');
             card.className = 'weather-card';
-            card.innerHTML = '<div class="loading">Loading ' + city + '...</div>';
+            card.innerHTML = '<p class="loading">Loading ' + city + '...</p>';
             container.appendChild(card);
 
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.weather && data.weather.length > 0) {
-                        card.innerHTML = weatherMarkup(city, data.weather[0].main, data.main.temp, false);
+                        renderWeatherCard(card, data, city);
                     } else {
-                        card.innerHTML = '<div>Weather data unavailable.</div>';
+                        card.innerHTML = '<p class="error">Weather data unavailable.</p>';
                     }
                 })
                 .catch(() => {
-                    card.innerHTML = `<div>Failed to load ${city}.</div>`;
+                    card.innerHTML = '<p class="error">Failed to load ' + city + '.</p>';
                 });
         });
     </script>
