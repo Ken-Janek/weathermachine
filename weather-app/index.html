@@ -4,19 +4,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; padding: 2rem; min-height: 100vh; box-sizing: border-box; }
-        .container { display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; max-width: 320px; }
-        .weather-card { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; width: 100%; box-sizing: border-box; }
-        .loading { color: #888; }
+        :root {
+            --bg-top: #f3e7d2;
+            --bg-bottom: #e9ddcc;
+            --ink: #32261c;
+            --muted: #7a6656;
+            --card: rgba(255, 249, 241, 0.9);
+            --accent: #b4633a;
+            --accent-soft: #efd5c4;
+            --shadow: 0 14px 30px rgba(73, 52, 38, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            color: var(--ink);
+            background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 3rem;
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 720px;
+            position: relative;
+        }
+
+        .app-shell::before,
+        .app-shell::after {
+            content: '';
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(1px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app-shell::before {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255, 208, 176, 0.45), transparent 70%);
+            top: -30px;
+            right: -10px;
+        }
+
+        .app-shell::after {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(210, 173, 149, 0.25), transparent 70%);
+            bottom: 20px;
+            left: -20px;
+        }
+
+        .title {
+            position: relative;
+            z-index: 1;
+            font-family: 'Fraunces', serif;
+            font-size: clamp(1.9rem, 5vw, 2.6rem);
+            margin: 0 0 0.3rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 1.4rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.9rem;
+            width: 100%;
+        }
+
+        .weather-card {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid rgba(139, 99, 73, 0.15);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 1.1rem 1.2rem;
+            backdrop-filter: blur(2px);
+            transform: translateY(10px);
+            opacity: 0;
+            animation: cardIn 0.55s ease forwards;
+        }
+
+        .weather-card.your-location {
+            border: 2px solid var(--accent);
+            background: linear-gradient(160deg, rgba(255, 247, 238, 0.96), rgba(246, 228, 212, 0.8));
+        }
+
+        .weather-card h2 {
+            margin: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            line-height: 1.2;
+        }
+
+        .condition {
+            margin-top: 0.45rem;
+            font-size: 1.05rem;
+            color: var(--muted);
+        }
+
+        .temp {
+            margin-top: 0.2rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .loading {
+            color: var(--muted);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        @keyframes cardIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 1.4rem 0.8rem 2.4rem; }
+            .weather-card { border-radius: 14px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="weather-container"></div>
+    <main class="app-shell">
+        <h1 class="title">Cozy Weather</h1>
+        <p class="subtitle">Your location first, then Estonia city updates</p>
+        <div class="container" id="weather-container"></div>
+    </main>
     <script>
         const API_KEY = '542fcb5a99721dd037420fd7893c8567';
         const cities = ['Tallinn', 'Tartu', 'Pärnu', 'Narva', 'Viljandi'];
         const container = document.getElementById('weather-container');
+
+        function weatherMarkup(title, condition, temp, pin) {
+            const heading = pin ? '&#128205; ' + title : title;
+            return '<h2>' + heading + '</h2><div class="condition">' + condition + '</div><div class="temp">' + temp + '&deg;C</div>';
+        }
+
+        // Geolocation card at top
+        const geoCard = document.createElement('div');
+        geoCard.className = 'weather-card your-location';
+        geoCard.innerHTML = '<div class="loading">Detecting your location...</div>';
+        container.appendChild(geoCard);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&appid=' + API_KEY + '&units=metric')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.weather && data.weather.length > 0) {
+                            geoCard.innerHTML = weatherMarkup(data.name, data.weather[0].main, data.main.temp, true);
+                        } else {
+                            geoCard.innerHTML = '<div>Weather data unavailable.</div>';
+                        }
+                    })
+                    .catch(() => { geoCard.innerHTML = '<div>Failed to load your location weather.</div>'; });
+            }, function() {
+                geoCard.innerHTML = '<div>Location access denied.</div>';
+            });
+        } else {
+            geoCard.innerHTML = '<div>Geolocation not supported.</div>';
+        }
 
         cities.forEach(city => {
             const card = document.createElement('div');
@@ -28,11 +200,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.weather && data.weather.length > 0) {
-                        card.innerHTML = `
-                            <h2>${city}</h2>
-                            <div style="font-size:2rem;">${data.weather[0].main}</div>
-                            <div>${data.main.temp}°C</div>
-                        `;
+                        card.innerHTML = weatherMarkup(city, data.weather[0].main, data.main.temp, false);
                     } else {
                         card.innerHTML = '<div>Weather data unavailable.</div>';
                     }
