@@ -176,10 +176,84 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
+        function toEstonianCondition(description) {
+            const exact = {
+                'clear sky': 'selge taevas',
+                'few clouds': 'vähene pilvisus',
+                'scattered clouds': 'hajutatud pilved',
+                'broken clouds': 'vahelduv pilvisus',
+                'overcast clouds': 'lauspilvisus',
+                'shower rain': 'hoovihm',
+                'light rain': 'nõrk vihm',
+                'moderate rain': 'mõõdukas vihm',
+                'heavy intensity rain': 'tugev vihm',
+                'very heavy rain': 'väga tugev vihm',
+                'extreme rain': 'äärmiselt tugev vihm',
+                'light intensity shower rain': 'nõrk hoovihm',
+                'heavy intensity shower rain': 'tugev hoovihm',
+                'ragged shower rain': 'ebaregulaarne hoovihm',
+                'thunderstorm': 'äike',
+                'thunderstorm with rain': 'äike vihmaga',
+                'thunderstorm with heavy rain': 'äike tugeva vihmaga',
+                'snow': 'lumi',
+                'light snow': 'nõrk lumesadu',
+                'heavy snow': 'tugev lumesadu',
+                'sleet': 'lörts',
+                'mist': 'udu',
+                'fog': 'udu',
+                'haze': 'vine',
+                'smoke': 'suits',
+                'dust': 'tolm',
+                'sand': 'liivatolm',
+                'ash': 'vulkaaniline tuhk',
+                'squall': 'puhanguline tuul',
+                'tornado': 'tornaado'
+            };
+
+            const normalized = String(description || '').toLowerCase().trim();
+            if (exact[normalized]) {
+                return exact[normalized];
+            }
+
+            const parts = normalized.split(' ');
+            const wordMap = {
+                clear: 'selge',
+                few: 'vähene',
+                scattered: 'hajutatud',
+                broken: 'vahelduv',
+                overcast: 'laus',
+                clouds: 'pilvisus',
+                cloud: 'pilv',
+                light: 'nõrk',
+                moderate: 'mõõdukas',
+                heavy: 'tugev',
+                very: 'väga',
+                rain: 'vihm',
+                shower: 'hoovihm',
+                drizzle: 'uduvihm',
+                thunderstorm: 'äike',
+                with: 'koos',
+                snow: 'lumi',
+                sleet: 'lörts',
+                mist: 'udu',
+                fog: 'udu',
+                haze: 'vine',
+                smoke: 'suits',
+                dust: 'tolm',
+                sand: 'liiv',
+                squall: 'puhang',
+                tornado: 'tornaado'
+            };
+
+            const translated = parts.map(part => wordMap[part] || part).join(' ');
+            return translated || description;
+        }
+
         function renderWeatherCard(card, data, label) {
             const iconCode = data.weather[0].icon;
             const iconUrl = 'https://openweathermap.org/img/wn/' + iconCode + '@2x.png';
             const cityName = label || data.name;
+            const conditionText = toEstonianCondition(data.weather[0].description);
 
             card.innerHTML =
                 '<div class="card-top">' +
@@ -187,7 +261,7 @@
                 '<img class="weather-icon" src="' + iconUrl + '" alt="' + data.weather[0].description + '">' +
                 '</div>' +
                 '<p class="temp">' + Math.round(data.main.temp) + '°C</p>' +
-                '<p class="condition">' + data.weather[0].description + '</p>' +
+                '<p class="condition">' + conditionText + '</p>' +
                 '<div class="meta">' +
                 '<span>Tundub nagu ' + Math.round(data.main.feels_like) + '°C</span>' +
                 '<span>Niiskus ' + data.main.humidity + '%</span>' +
